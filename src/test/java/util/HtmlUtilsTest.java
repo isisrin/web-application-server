@@ -1,13 +1,12 @@
 package util;
 
+import model.User;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import static org.junit.Assert.*;
 
 public class HtmlUtilsTest {
 
@@ -23,9 +22,22 @@ public class HtmlUtilsTest {
             "Cookie: SL_G_WPT_TO=ko; SL_GWPT_Show_Hide_tmp=undefined; SL_wptGlobTipTmp=undefined\n";
 
     @Test
-    public void 헤더읽기() {
+    public void 헤더읽기_html() {
         String result = HtmlUtils.getFileLocation("GET /index.html HTTP/1.1\n");
         Assertions.assertThat(result).isEqualTo("/index.html");
+    }
+
+    @Test
+    public void 헤더읽기_requestParam() {
+        String result = HtmlUtils.getQueryString("GET /user/create?userId=test&password=test1&name=박혜린&email=isisrin%40nate.com");
+        Assertions.assertThat(result).isEqualTo("userId=test&password=test1&name=박혜린&email=isisrin%40nate.com");
+
+    }
+
+    @Test
+    public void 유저_가져오기() {
+        User result = HtmlUtils.getObject("userId=test&password=test1&name=박혜린&email=isisrin%40nate.com");
+        Assertions.assertThat(result.toString()).isEqualTo(new User("test", "test1", "박혜린", "isisrin%40nate.com").toString());
     }
 
     @Test
