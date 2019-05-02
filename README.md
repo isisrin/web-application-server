@@ -21,8 +21,17 @@
 * 
 
 ### 요구사항 3 - post 방식으로 회원가입
-* 
+* 아래와 같이 입력하면 stream의 첫번째로 돌아갈 수 있다! ㅇㅁㅇ!
+```
+  int BUFFER_SIZE = 1000;
 
+  buf.mark(BUFFER_SIZE);
+  buf.readLine();  // returns the GET
+  buf.readLine();  // returns the Host header
+  buf.reset();     // rewinds the stream back to the mark
+  buf.readLine();  // returns the GET again
+
+```
 ### 요구사항 4 - redirect 방식으로 이동
 * 
 
