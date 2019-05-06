@@ -33,8 +33,20 @@
 
 ```
 ### 요구사항 4 - redirect 방식으로 이동
-* 
+* Location 과 Content-Location의 차이!
+```
+Location이 리다이렉션의 대상(혹은 새롭게 만들어진 문서의 URL)을 가르키는데 반해,
+Content-Location은 더 이상의 컨텐츠 협상없이, 리소스 접근에 필요한 직접적인 URL을 가르킵니다.
+Location은 응답과 연관된 헤더인데 반해, Content-Location 은 반환된 개체와 연관이 있습니다.
+```
+POST일 때에는 Location이로군!
 
+* static 함수가 깔린 Class는 abstract를 써주자!
+아니면 아래와 같이 쓸 수 있기 때문
+```
+A a = new A();
+a.method() // ---- X
+```
 ### 요구사항 5 - cookie
 * 
 
