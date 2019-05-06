@@ -50,7 +50,13 @@ public class HtmlUtilsTest {
 
     @Test
     public void 유저_가져오기() {
-        User result = HtmlUtils.getObject("userId=test&password=test1&name=박혜린&email=isisrin%40nate.com");
+        User result = HtmlUtils.joinUser("userId=test&password=test1&name=박혜린&email=isisrin%40nate.com");
+        Assertions.assertThat(result.toString()).isEqualTo(new User("test", "test1", "박혜린", "isisrin%40nate.com").toString());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void 유저정보_빈값() {
+        User result = HtmlUtils.joinUser("userId=test&name=박혜린&email=isisrin%40nate.com");
         Assertions.assertThat(result.toString()).isEqualTo(new User("test", "test1", "박혜린", "isisrin%40nate.com").toString());
     }
 

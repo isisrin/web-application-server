@@ -1,5 +1,6 @@
 package webserver;
 
+import db.DataBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HtmlUtils;
@@ -34,17 +35,30 @@ public class RequestHandler extends Thread {
         String firstLine = HtmlUtils.getFirstLine(bufferedReader);
 
         if(firstLine.contains("POST")) {
-            HtmlUtils.getObject(HtmlUtils.getBody(bufferedReader));
-            response302Header(dos, INDEX_HTML);
+            if(firstLine.contains("/user/login")) {
+                String body = HtmlUtils.getBody(bufferedReader);
+                if(DataBase.findUserById(HtmlUtils.login(body)) != null) {
+                    response302Header(dos, "/user/list.html", true);
+                    return;
+                }
+                response302Header(dos, "/user/form.html", false);
+                return;
+            }
+            if(firstLine.contains("/user/create")) {
+                DataBase.addUser(HtmlUtils.joinUser(HtmlUtils.getBody(bufferedReader)));
+                response302Header(dos, INDEX_HTML, true);
+                return;
+            }
         }
 
         if(firstLine.contains("GET")) {
             if(firstLine.contains("?")) {
-                HtmlUtils.getObject(HtmlUtils.getQueryString(firstLine));
+                DataBase.addUser(HtmlUtils.joinUser(HtmlUtils.getQueryString(firstLine)));
                 getResponse(dos, INDEX_HTML);
                 return;
             }
 
+            //로그인 http://localhost:8080/user/login.html
             getResponse(dos, HtmlUtils.getFileLocation(firstLine));
         }
     }
@@ -66,11 +80,11 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private void response302Header(DataOutputStream dos, String location) {
+    private void response302Header(DataOutputStream dos, String location, boolean isLogin) {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: http://localhost:8080" + location);
-            dos.writeBytes("\r\n");
+            dos.writeBytes("Location: http://localhost:8080" + location +"\r\n");
+            dos.writeBytes("Set-Cookie: logined=" + isLogin + "\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
         }

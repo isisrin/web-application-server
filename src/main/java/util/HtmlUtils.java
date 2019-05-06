@@ -42,11 +42,14 @@ public abstract class HtmlUtils {
         return firstLine.split(QUERY_PATTERN)[REQUEST_RESOURCES];
     }
 
-    public static User getObject(String queryString) {
+    public static User joinUser(String queryString) {
         Map<String, String> params = HttpRequestUtils.parseQueryString(queryString);
         User user = new User(params.get("userId"), params.get("password"), params.get("name"), params.get("email"));
-        System.out.println("유저  "+ user.toString());
         return user;
     }
 
+    public static String login(String queryString) {
+        Map<String, String> params = HttpRequestUtils.parseQueryString(queryString);
+        return params.get("userId");
+    }
 }
