@@ -6,40 +6,26 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.Map;
 
-public class HtmlUtils {
+public abstract class HtmlUtils {
     private static final String SPLIT_PATTERN = " ";
     public static final int REQUEST_RESOURCES = 1;
     public static final String SERVER_WEBAPP_PATH = "/Users/hyerin/study/web-application-server/webapp";
     public static final String QUERY_PATTERN = "\\?";
 
-    public static byte[] getHtml(InputStream inputStream) throws IOException {
-        return Files.readAllBytes(new File(SERVER_WEBAPP_PATH + getLocation(inputStream)).toPath());
+    public static byte[] getHtml(String pageLocation) throws IOException {
+        return Files.readAllBytes(new File(SERVER_WEBAPP_PATH + pageLocation).toPath());
     }
 
-    private static String getLocation(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-        return getFileLocation(bufferedReader);
+    public static String getFileLocation(String firstLine) {
+        String[] header = firstLine.split(SPLIT_PATTERN);
+        return header[REQUEST_RESOURCES];
     }
 
-    static String getFileLocation(BufferedReader bufferedReader) throws IOException{
-        String[] header = getFirstLine(bufferedReader).split(SPLIT_PATTERN);
-        if(header[0].contains("POST")) {
-            getObject(getBody(bufferedReader));
-            return "/index.html";
-        }
-        String request_resource = header[REQUEST_RESOURCES];
-        if(request_resource.contains("?")) {
-           getObject(getQueryString(request_resource));
-           return "/index.html";
-        }
-        return request_resource;
-    }
-
-    private static String getFirstLine(BufferedReader bufferedReader) {
+    public static String getFirstLine(BufferedReader bufferedReader) {
         return bufferedReader.lines().filter(line -> line != null).findFirst().get();
     }
 
-    static String getBody(BufferedReader bufferedReader) throws IOException {
+    public static String getBody(BufferedReader bufferedReader) throws IOException {
         String contentLength = getLength(bufferedReader);
         String line = contentLength;
         while(!"".equals(line)) {
@@ -52,14 +38,15 @@ public class HtmlUtils {
         return bufferedReader.lines().filter(line -> line.contains("Length")).findFirst().get();
     }
 
-    static String getQueryString(String firstLine) {
+    public static String getQueryString(String firstLine) {
         return firstLine.split(QUERY_PATTERN)[REQUEST_RESOURCES];
     }
 
-    static User getObject(String queryString) {
+    public static User getObject(String queryString) {
         Map<String, String> params = HttpRequestUtils.parseQueryString(queryString);
         User user = new User(params.get("userId"), params.get("password"), params.get("name"), params.get("email"));
         System.out.println("유저  "+ user.toString());
         return user;
     }
+
 }

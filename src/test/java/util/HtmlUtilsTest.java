@@ -36,10 +36,8 @@ public class HtmlUtilsTest {
             "userId=test&password=test1&name=%EB%B0%95%ED%98%9C%EB%A6%B0&email=isisrin%40nate.com";
 
     @Test
-    public void 헤더읽기_html() throws IOException {
-        inputStream = new ByteArrayInputStream(getSampleHeader.getBytes());
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-        String result = HtmlUtils.getFileLocation(bufferedReader);
+    public void 헤더읽기_html() {
+        String result = HtmlUtils.getFileLocation("GET /index.html HTTP/1.1\n");
         Assertions.assertThat(result).isEqualTo("/index.html");
     }
 
@@ -58,9 +56,7 @@ public class HtmlUtilsTest {
 
     @Test
     public void 파일읽기() throws IOException {
-        inputStream = new ByteArrayInputStream(getSampleHeader.getBytes());
-        byte[] result = HtmlUtils.getHtml(inputStream);
-        System.out.println(new String(result));
+        byte[] result = HtmlUtils.getHtml("/index.html");
         Assertions.assertThat(result.length).isEqualTo(10500);
     }
 
