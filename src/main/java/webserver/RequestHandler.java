@@ -8,6 +8,7 @@ import util.HttpRequestUtils;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class RequestHandler extends Thread {
@@ -16,7 +17,7 @@ public class RequestHandler extends Thread {
 
     private Socket connection;
 
-    public RequestHandler(Socket connectionSocket) {
+    RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
     }
 
@@ -32,8 +33,8 @@ public class RequestHandler extends Thread {
         }
     }
 
-    public void response(InputStream inputStream, DataOutputStream dos) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+    private void response(InputStream inputStream, DataOutputStream dos) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         String firstLine = HtmlUtils.getFirstLine(bufferedReader);
 
         if(firstLine.contains("POST")) {
@@ -65,9 +66,8 @@ public class RequestHandler extends Thread {
     }
 
     private void responseDynamicHtml(DataOutputStream dos, byte[] bytes) {
-        byte[] body = bytes;
-        response200Header(dos, body.length);
-        responseBody(dos, body);
+        response200Header(dos, bytes.length);
+        responseBody(dos, bytes);
     }
 
     private void getResponse(DataOutputStream dos, String htmlName) throws IOException {
