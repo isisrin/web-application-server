@@ -4,9 +4,11 @@ import db.DataBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HtmlUtils;
+import util.HttpRequestUtils;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Map;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -36,9 +38,10 @@ public class RequestHandler extends Thread {
 
         if(firstLine.contains("POST")) {
             if(firstLine.contains("/user/login")) {
-                String body = HtmlUtils.getBody(bufferedReader);
-                if(DataBase.findUserById(HtmlUtils.login(body)) != null) {
-                    response302Header(dos, "/user/list.html", true);
+                String cookie = HtmlUtils.getCookie(bufferedReader);
+                Map<String, String> cookies = HttpRequestUtils.parseCookies(cookie);
+                if(Boolean.parseBoolean(cookies.get("Cookie: logined"))) {
+                    responseDynamicHtml(dos, HtmlUtils.generateHtmlTable());
                     return;
                 }
                 response302Header(dos, "/user/form.html", false);
@@ -57,10 +60,14 @@ public class RequestHandler extends Thread {
                 getResponse(dos, INDEX_HTML);
                 return;
             }
-
-            //로그인 http://localhost:8080/user/login.html
             getResponse(dos, HtmlUtils.getFileLocation(firstLine));
         }
+    }
+
+    private void responseDynamicHtml(DataOutputStream dos, byte[] bytes) {
+        byte[] body = bytes;
+        response200Header(dos, body.length);
+        responseBody(dos, body);
     }
 
     private void getResponse(DataOutputStream dos, String htmlName) throws IOException {

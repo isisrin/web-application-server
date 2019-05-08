@@ -1,13 +1,17 @@
 package util;
 
+import db.DataBase;
 import model.User;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 import java.io.*;
+import java.util.Map;
 
 public class HtmlUtilsTest {
 
+    private static final User MOCK_USER = new User("test", "test1", "박혜린", "isisrin%40nate.com");
+    private static final User MOCK_OTHER_USER = new User("test2", "test2", "박혜린2", "hyerin@google.com");
     private InputStream inputStream;
     private static final String getSampleHeader = "GET /index.html HTTP/1.1\n" +
             "Host: localhost:8080\n" +
@@ -51,13 +55,13 @@ public class HtmlUtilsTest {
     @Test
     public void 유저_가져오기() {
         User result = HtmlUtils.joinUser("userId=test&password=test1&name=박혜린&email=isisrin%40nate.com");
-        Assertions.assertThat(result.toString()).isEqualTo(new User("test", "test1", "박혜린", "isisrin%40nate.com").toString());
+        Assertions.assertThat(result.toString()).isEqualTo(MOCK_USER.toString());
     }
 
     @Test(expected = NullPointerException.class)
     public void 유저정보_빈값() {
         User result = HtmlUtils.joinUser("userId=test&name=박혜린&email=isisrin%40nate.com");
-        Assertions.assertThat(result.toString()).isEqualTo(new User("test", "test1", "박혜린", "isisrin%40nate.com").toString());
+        Assertions.assertThat(result.toString()).isEqualTo(MOCK_USER.toString());
     }
 
     @Test
@@ -73,6 +77,21 @@ public class HtmlUtilsTest {
         String result = HtmlUtils.getBody(bufferedReader);
         System.out.println(result);
         Assertions.assertThat(result).isEqualTo("userId=test&password=test1&name=%EB%B0%95%ED%98%9C%EB%A6%B0&email=isisrin%40nate.com");
+    }
+
+    @Test
+    public void 파스쿠키_테스트() {
+        Map<String, String> result = HttpRequestUtils.parseCookies("Cookie: logined=true");
+        Assertions.assertThat(result).isEqualTo("");
+    }
+
+    @Test
+    public void getTbody_test() {
+        DataBase.addUser(MOCK_USER);
+        DataBase.addUser(MOCK_OTHER_USER);
+
+        byte[] result = HtmlUtils.generateHtmlTable();
+        Assertions.assertThat(result.length).isEqualTo(311);
     }
 
 }
