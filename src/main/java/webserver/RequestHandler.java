@@ -61,6 +61,9 @@ public class RequestHandler extends Thread {
                 getResponse(dos, INDEX_HTML);
                 return;
             }
+            if(firstLine.contains("css")) {
+                getResponse(dos, HtmlUtils.getFileLocation(firstLine), true);
+            }
             getResponse(dos, HtmlUtils.getFileLocation(firstLine));
         }
     }
@@ -71,7 +74,16 @@ public class RequestHandler extends Thread {
     }
 
     private void getResponse(DataOutputStream dos, String htmlName) throws IOException {
+        getResponse(dos, htmlName, false);
+    }
+
+    private void getResponse(DataOutputStream dos, String htmlName, boolean isCss) throws IOException {
         byte[] body = HtmlUtils.getHtml(htmlName);
+        if(isCss) {
+            responseCss200Header(dos, body.length);
+            responseBody(dos, body);
+            return;
+        }
         response200Header(dos, body.length);
         responseBody(dos, body);
     }
@@ -80,6 +92,17 @@ public class RequestHandler extends Thread {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void responseCss200Header(DataOutputStream dos, int lengthOfBodyContent) {
+        try {
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Type: text/css;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
