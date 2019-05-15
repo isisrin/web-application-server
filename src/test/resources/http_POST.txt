@@ -1,0 +1,16 @@
+POST /user/create HTTP/1.1
+Host: localhost:8080
+Connection: keep-alive
+Content-Length: 84
+Cache-Control: max-age=0
+Origin: http://localhost:8080
+Upgrade-Insecure-Requests: 1
+Content-Type: application/x-www-form-urlencoded
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3
+Referer: http://localhost:8080/user/form.html
+Accept-Encoding: gzip, deflate, br
+Accept-Language: ko,en;q=0.9,en-US;q=0.8
+Cookie: SL_G_WPT_TO=ko; SL_GWPT_Show_Hide_tmp=undefined; SL_wptGlobTipTmp=undefined
+
+userId=test&password=test1&name=%EB%B0%95%ED%98%9C%EB%A6%B0&email=isisrin%40nate.com
