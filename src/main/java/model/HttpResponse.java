@@ -1,5 +1,6 @@
 package model;
 
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HtmlUtils;
@@ -12,6 +13,9 @@ import java.util.Map;
 
 public class HttpResponse {
     private static final Logger log = LoggerFactory.getLogger(HttpResponse.class);
+    private static final String TYPE_CSS = "css";
+    private static final String TYPE_HTML = "html";
+    private static final String CARRIAGE_RETURN = "\r\n";
 
     private DataOutputStream dos;
     private Map<String, String> header;
@@ -36,38 +40,27 @@ public class HttpResponse {
     }
 
     private void getResponse(String htmlName) throws IOException {
-        getResponse(htmlName, false);
-    }
-
-    private void getResponse(String htmlName, boolean isCss) throws IOException {
         byte[] body = HtmlUtils.getHtml(htmlName);
-        if(isCss) {
-            responseCss200Header(dos, body.length);
-            responseBody(dos, body);
-            return;
-        }
-        response200Header(dos, body.length);
+        response200Header(dos, body.length, getType(htmlName));
         responseBody(dos, body);
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-//            dos.writeBytes("Content-Type: text/html" + "여기가  css면 String return css하면되겠네" + ";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
+    public void dynamicResponse(String content) {
+        byte[] body = content.getBytes();
+        response200Header(dos, body.length, TYPE_HTML);
+        responseBody(dos, body);
     }
 
-    private void responseCss200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private String getType(String htmlName) {
+        return (htmlName.contains(TYPE_CSS)) ? TYPE_CSS : TYPE_HTML;
+    }
+
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String type) {
         try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/css;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
+            dos.writeBytes("HTTP/1.1 200 OK" + CARRIAGE_RETURN);
+            dos.writeBytes("Content-Type: text/" + type + ";charset=utf-8" + CARRIAGE_RETURN);
+            dos.writeBytes("Content-Length: " + lengthOfBodyContent + CARRIAGE_RETURN);
+            dos.writeBytes(CARRIAGE_RETURN);
         } catch (IOException e) {
             log.error(e.getMessage());
         }
@@ -77,17 +70,20 @@ public class HttpResponse {
         header.put(headerKey, headerValue);
     }
 
+    @SneakyThrows
     public void sendRedirect(String redirectUrl) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: http://localhost:8080" + redirectUrl +"\r\n");
-            if(!header.isEmpty()) {
-                dos.writeBytes("Set-Cookie" + ": " +  header.get("Set-Cookie") + "\r\n");
-            }
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.error(e.getMessage());
+        dos.writeBytes("HTTP/1.1 302 Found" + CARRIAGE_RETURN);
+        dos.writeBytes("Location: http://localhost:8080" + redirectUrl + CARRIAGE_RETURN);
+        if(!header.isEmpty()) {
+            setResponseHeader();
         }
-        
+        dos.writeBytes(CARRIAGE_RETURN);
+    }
+
+    @SneakyThrows
+    private void setResponseHeader() {
+        for (String key : header.keySet()) {
+            dos.writeBytes(key + ": " +  header.get(key) + CARRIAGE_RETURN);
+        }
     }
 }

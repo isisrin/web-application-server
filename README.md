@@ -54,4 +54,16 @@ a.method() // ---- X
 * 
 
 ### heroku 서버에 배포 후
-* 
+*
+
+### 리팩토링 하면서 알게 된 점
+* java8이후에 interface에 static을 붙일 수 있게 되었다!
+ ```
+ default 메소드
+ - interface내에서 메소드 구현이 가능
+ - implements한 클래스에서 재정의 가능
+
+ static 메소드
+ - interface내에서 메소드 구현 가능
+ - 재정의 불가
+```
