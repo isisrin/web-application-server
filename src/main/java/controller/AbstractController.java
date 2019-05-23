@@ -18,7 +18,6 @@ public abstract class AbstractController implements Controller {
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse){}
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse){}
 
-    // TODO : 어노테이션으로 추출할 수 있는지 확인
     static {
         urlMatcher.put("/user/create", createUserController);
         urlMatcher.put("/user/list", listUserController);

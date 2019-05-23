@@ -9,10 +9,14 @@ public class CreateUserController extends AbstractController {
 
     @Override
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
-        DataBase.addUser(new User(httpRequest.getHeader("userId"), 
+        joinUser(httpRequest);
+        httpResponse.sendRedirect("/index.html");
+    }
+
+    private void joinUser(HttpRequest httpRequest) {
+        DataBase.addUser(new User(httpRequest.getHeader("userId"),
                                     httpRequest.getHeader("password"),
                                     httpRequest.getHeader("name"),
                                     httpRequest.getHeader("email")));
-        httpResponse.sendRedirect("/index.html");
     }
 }
